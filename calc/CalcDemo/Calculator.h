@@ -22,7 +22,7 @@ public:
 
     QString calculate();
     void clear();
-    void plus_minus();
+
     QList<char> availibleOperations();
 
 

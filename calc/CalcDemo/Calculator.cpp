@@ -55,14 +55,8 @@ void Calculator::setOperation(char operation)
 }
 void Calculator::clear(){
     m_operation=' ';
-
-
 }
-void Calculator::plus_minus(){
-  m_firstValue.toDouble()*-1;
-  m_secondValue.toDouble()*-1;
 
-}
 QString Calculator::calculate()
 {
     return QString::number(

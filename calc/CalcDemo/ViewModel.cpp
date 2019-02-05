@@ -37,6 +37,21 @@ void ViewModel::plus_minus()
     m_state->plus_minus();
     sendUpdateLabel(m_state->formatLabel());
 }
+void ViewModel::percent()
+{
+    m_state->percent();
+    sendUpdateLabel(m_state->formatLabel());
+}
+void ViewModel::dot()
+{
+    m_state->dot();
+    sendUpdateLabel(m_state->formatLabel());
+}
+void ViewModel::backspace()
+{
+    m_state->backspace();
+    sendUpdateLabel(m_state->formatLabel());
+}
 /*-----------------*/
 ViewModel::State::Ptr ViewModel::state() const
 {
@@ -95,11 +110,14 @@ void ViewModel::InputFirstNumberState::onNumberSelected(QString numberChar)
 
 void ViewModel::InputFirstNumberState::onOperationSelected(QString operationChar)
 {
+    oper+=operationChar;
 
     Ptr This(parent()->state());
     parent()->calculator().setFirstValue(m_firstValueBuffer);
-    parent()->calculator().setOperation(operationChar.toLocal8Bit()[0]);
+    parent()->calculator().setOperation(oper.toLocal8Bit()[0]);
+
     parent()->setState(Ptr(new InputSecondNumberState(parent())));
+
 }
 
 void ViewModel::InputFirstNumberState::onEqSelected()
@@ -117,9 +135,30 @@ void ViewModel::InputFirstNumberState::clear()
 }
 void ViewModel::InputFirstNumberState::plus_minus()
 {
-    parent()->calculator().plus_minus();
+    m_firstValueBuffer = QString::number(m_firstValueBuffer.toDouble()*-1);
+}
+void ViewModel::InputFirstNumberState::percent()
+{
+    m_firstValueBuffer = QString::number(m_firstValueBuffer.toDouble()*0.01);
+}
+void ViewModel::InputFirstNumberState::dot()
+{
+    if(m_firstValueBuffer!=""){
+    m_firstValueBuffer = m_firstValueBuffer+".";
+    }
+}
+void ViewModel::InputFirstNumberState::backspace()
+{
+    if(oper!=""){
+     parent()->setState(Ptr(new InputFirstNumberState(parent())));
+     parent()->calculator().setFirstValue(m_firstValueBuffer);
+
+    }
+    if(m_firstValueBuffer!=""){
+   m_firstValueBuffer.remove(m_firstValueBuffer.size() - 1, 1);}
 
 }
+
 QString ViewModel::InputFirstNumberState::formatLabel()
 {
     return QString("%1").arg(m_firstValueBuffer);
@@ -148,15 +187,19 @@ void ViewModel::InputSecondNumberState::onNumberSelected(QString numberChar)
 }*/
 void ViewModel::InputSecondNumberState::onOperationSelected(QString operationChar)
 {
+
     Ptr This(parent()->state());
     if (m_secondValueBuffer != "") {
+
         parent()->calculator().setSecondValue(m_secondValueBuffer);
         auto result = parent()->calculator().calculate();
         parent()->calculator().setFirstValue(result);
         parent()->calculator().setOperation(operationChar.toLocal8Bit()[0]);
+
         m_secondValueBuffer = "";
     } else {
         parent()->calculator().setOperation(operationChar.toLocal8Bit()[0]);
+
     }
 }
 void ViewModel::InputSecondNumberState::onEqSelected()
@@ -174,7 +217,28 @@ void ViewModel::InputSecondNumberState::clear()
 }
 void ViewModel::InputSecondNumberState::plus_minus()
 {
-   parent()->calculator().plus_minus();
+    if (m_secondValueBuffer != "") {
+   m_secondValueBuffer = QString::number(m_secondValueBuffer.toDouble()*-1);}
+
+}
+void ViewModel::InputSecondNumberState::percent()
+{
+    m_secondValueBuffer = QString::number(m_secondValueBuffer.toDouble()*0.01);
+}
+void ViewModel::InputSecondNumberState::dot()
+{
+    m_secondValueBuffer = m_secondValueBuffer+".";
+}
+void ViewModel::InputSecondNumberState::backspace()
+{
+   /*if(oper1!=""){
+       parent()->setState(Ptr(new InputFirstNumberState(parent())));
+   }*/
+    if(m_secondValueBuffer!=""){
+        m_secondValueBuffer.remove(m_secondValueBuffer.size() - 1, 1);
+    }
+
+
 }
 QString ViewModel::InputSecondNumberState::formatLabel()
 {
@@ -208,6 +272,18 @@ void ViewModel::PrintResultState::clear()
     parent()->setState(Ptr(new InputFirstNumberState(parent())));
 }
 void ViewModel::PrintResultState::plus_minus()
+{
+
+}
+void ViewModel::PrintResultState::percent()
+{
+
+}
+void ViewModel::PrintResultState::dot()
+{
+
+}
+void ViewModel::PrintResultState::backspace()
 {
 
 }
